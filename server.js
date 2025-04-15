@@ -6,9 +6,8 @@ const { v4: uuidv4 } = require('uuid');
 const path = require('path');
 require('dotenv').config();
 
-
 const app = express();
-const PORT = 9001;
+const PORT = process.env.PORT || 9001;
 
 // MongoDB connection
 const mongoURI = process.env.MONGO_URI;
@@ -16,7 +15,7 @@ mongoose.connect(mongoURI, {
   useNewUrlParser: true,
   useUnifiedTopology: true
 })
-.then(() => console.error('[MongoDB] Connected successfully'))
+.then(() => console.log('[MongoDB] Connected successfully'))
 .catch(err => console.error('[MongoDB] Connection error:', err));
 
 // User Schema
@@ -26,7 +25,6 @@ const userSchema = new mongoose.Schema({
   totalBalance: Number,
   name: String
 });
-
 const User = mongoose.model('User', userSchema);
 
 // Transfer Schema
@@ -42,20 +40,18 @@ const transferSchema = new mongoose.Schema({
   frequency: String,
   createdAt: { type: Date, default: Date.now }
 });
-
 const Transfer = mongoose.model('Transfer', transferSchema);
 
 // Middleware
 app.use(cors({
-  origin:'https://walletsite1.onrender.com',
+  origin: process.env.CORS_ORIGIN || 'http://localhost:3000',
   credentials: true
 }));
-
 app.use(express.json());
 app.use(cookieParser());
 app.use(express.static('public'));
 
-// Sessions
+// Session storage
 const sessions = {};
 const SESSION_TIMEOUT = 5 * 60 * 1000;
 
@@ -63,16 +59,18 @@ setInterval(() => {
   const now = Date.now();
   for (const sessionId in sessions) {
     if (now - sessions[sessionId].createdAt > SESSION_TIMEOUT) {
-      console.error(`[Session Expired] Deleting sessionId: ${sessionId}`);
+      console.log(`[Session Expired] Removing ${sessionId}`);
       delete sessions[sessionId];
     }
   }
 }, 60000);
 
-// Login Route
+// Routes
+
+// Login
 app.post('/login', async (req, res) => {
   const { accessId, password } = req.body;
-  console.error(`[Login Attempt] Access ID: ${accessId}`);
+  console.log('[Login Attempt]', accessId);
 
   if (!accessId || !password) {
     return res.status(400).json({ success: false, message: 'Access ID and Passcode are required.' });
@@ -80,13 +78,16 @@ app.post('/login', async (req, res) => {
 
   try {
     const user = await User.findOne({ accessId });
+    console.log('[User Found]', user);
+
     if (user && user.password === password) {
       const sessionId = uuidv4();
       sessions[sessionId] = { accessId, createdAt: Date.now() };
 
       res.cookie('sessionId', sessionId, {
         httpOnly: true,
-        sameSite: 'Strict',
+        sameSite: 'None',
+        secure: true,
         maxAge: SESSION_TIMEOUT
       });
 
@@ -103,6 +104,8 @@ app.post('/login', async (req, res) => {
 // Check Session
 app.get('/check-session', (req, res) => {
   const sessionId = req.cookies.sessionId;
+  console.log('[Check Session] Cookies:', req.cookies);
+
   if (sessionId && sessions[sessionId]) {
     const sessionAge = Date.now() - sessions[sessionId].createdAt;
     if (sessionAge <= SESSION_TIMEOUT) {
@@ -111,6 +114,7 @@ app.get('/check-session', (req, res) => {
       delete sessions[sessionId];
     }
   }
+
   return res.status(401).json({ loggedIn: false });
 });
 
@@ -134,16 +138,15 @@ app.post('/save-transfer', async (req, res) => {
   const { accessId } = sessions[sessionId];
 
   try {
-    const generateId = () => {
-      const rand = Math.random().toString(36).substr(2, 8).toUpperCase();
-      return `TRX-${rand}`;
-    };
+    const generateId = () => `TRX-${Math.random().toString(36).substr(2, 8).toUpperCase()}`;
+
     const newTransfer = new Transfer({
       ...req.body,
       transactionId: generateId(),
       userAccessId: accessId,
       status: "Processing"
     });
+
     await newTransfer.save();
     res.json({ success: true });
   } catch (error) {
@@ -152,7 +155,7 @@ app.post('/save-transfer', async (req, res) => {
   }
 });
 
-// Get User Transfers
+// Get Transfers
 app.get('/get-transfers', async (req, res) => {
   const sessionId = req.cookies.sessionId;
   if (!sessionId || !sessions[sessionId]) {
@@ -189,7 +192,7 @@ app.get('/dashboard', async (req, res) => {
   });
 });
 
-// NEW: Balance-only route for transfer.html
+// Quick Balance Route
 app.get('/balance', async (req, res) => {
   const sessionId = req.cookies.sessionId;
   if (!sessionId || !sessions[sessionId]) {
@@ -206,5 +209,5 @@ app.get('/balance', async (req, res) => {
 
 // Start Server
 app.listen(PORT, () => {
-  console.error(`\n[Server Started] Listening on http://localhost:${PORT}\n`);
+  console.log(`[Server Started] Listening on port ${PORT}`);
 });
