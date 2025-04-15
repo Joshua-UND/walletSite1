@@ -47,7 +47,7 @@ const Transfer = mongoose.model('Transfer', transferSchema);
 
 // Middleware
 app.use(cors({
-  origin: process.env.CORS_ORIGIN,
+  origin: https: 'https://walletsite1.onrender.com/',
   credentials: true
 }));
 
