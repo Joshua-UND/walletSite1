@@ -399,7 +399,7 @@ window.addEventListener('DOMContentLoaded', async () => {
     // Fetch totalBalance from backend and animate UI
     async function fetchAndAnimateBalance() {
     try {
-      const res = await fetch('http://localhost:3000/dashboard', {
+      const res = await fetch('http://walletsite1.onrender.com/dashboard', {
         credentials: 'include'
       });
       const data = await res.json();
