@@ -4,12 +4,14 @@ const mongoose = require('mongoose');
 const cookieParser = require('cookie-parser');
 const { v4: uuidv4 } = require('uuid');
 const path = require('path');
+require('dotenv').config();
+
 
 const app = express();
 const PORT = 3000;
 
 // MongoDB connection
-const mongoURI = 'mongodb+srv://Result_Portal:Cluster0.Pass@cluster0.1b9wm.mongodb.net/trustbank';
+const mongoURI = process.env.MONGO_URI;
 mongoose.connect(mongoURI, {
   useNewUrlParser: true,
   useUnifiedTopology: true
