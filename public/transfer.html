@@ -15,7 +15,7 @@
 <script>
 window.addEventListener('DOMContentLoaded', async () => {
   try {
-    const response = await fetch('http://localhost:3000/check-session', {
+    const response = await fetch('https://walletsite1.onrender.com/check-session', {
       method: 'GET',
       credentials: 'include' // important to send cookies
     });
@@ -939,7 +939,7 @@ linear-gradient(90deg, #0046be, #132e6c);
     `;
 
     try {
-      const res = await fetch('http://localhost:3000/get-transfers');
+      const res = await fetch('https://walletsite1.onrender.com/get-transfers');
       const transfers = await res.json();
 
       transfers.forEach((tx, index) => {
@@ -1115,7 +1115,7 @@ document.getElementById('routingNumber')?.addEventListener('input', e => {
 <script>
   async function loadBalance() {
     try {
-      const res = await fetch('http://localhost:3000/balance', {
+      const res = await fetch('https://walletsite1.onrender.com/balance', {
         credentials: 'include'
       });
       const data = await res.json();
