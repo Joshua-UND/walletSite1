@@ -207,6 +207,26 @@ app.get('/balance', async (req, res) => {
   res.json({ totalBalance: user.totalBalance });
 });
 
+app.get('/account', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'account.html'));
+});
+
+app.get('/transfer', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'transfer.html'));
+});
+
+app.get('/deposit', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'deposit.html'));
+});
+
+app.get('/messages', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'messages.html'));
+});
+
+app.get('/more', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'more.html'));
+});
+
 // Start Server
 app.listen(PORT, () => {
   console.log(`[Server Started] Listening on port ${PORT}`);
