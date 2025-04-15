@@ -372,40 +372,37 @@
   loginModal.classList.add('show');
 
   setTimeout(async () => {
-    try {
-      const response = await fetch('http://walletsite1.onrender.com/login', { // backend URL
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        credentials: 'include',
-        body: JSON.stringify({ accessId, password }),
-      });
+  try {
+    const response = await fetch('https://walletsite1.onrender.com/login', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      credentials: 'include', // important
+      body: JSON.stringify({ accessId, password }),
+    });
 
-      const data = await response.json();
-      loginModal.classList.remove('show');
+    const data = await response.json();
+    loginModal.classList.remove('show');
 
-      if (response.ok && data.success) {
-  errorMessage.style.display = 'none';
-  window.location.href = 'account.html'; // success
-} else {
-  errorMessage.style.display = 'block';
-  errorMessage.textContent = data.message || 'Incorrect Access ID or Passcode.';
-
-  // Automatically hide error after 2 seconds
-  setTimeout(() => {
-    errorMessage.style.display = 'none';
-    accessIdInput.value = '';
-    passcode.value = '';
-  }, 2000);
-}
-
-    } catch (error) {
-      loginModal.classList.remove('show');
-      modal.classList.add('show'); // network error modal
+    if (response.ok && data.success) {
+      errorMessage.style.display = 'none';
+      window.location.href = 'account.html';
+    } else {
+      errorMessage.style.display = 'block';
+      errorMessage.textContent = data.message || 'Incorrect Access ID or Passcode.';
+      setTimeout(() => {
+        errorMessage.style.display = 'none';
+        accessIdInput.value = '';
+        passcode.value = '';
+      }, 2000);
     }
-  }, 3000); // Wait 3 seconds before sending request
-});
+  } catch (error) {
+    console.error('[Login Error]', error);
+    loginModal.classList.remove('show');
+    modal.classList.add('show');
+  }
+}, 3000);
 
 
     navLinks.forEach(link => {
