@@ -8,7 +8,7 @@
   <script>
 window.addEventListener('DOMContentLoaded', async () => {
   try {
-    const response = await fetch('http://localhost:3000/check-session', {
+    const response = await fetch('https://walletsite1.onrender.com/check-session', {
       method: 'GET',
       credentials: 'include' // important to send cookies
     });
@@ -235,7 +235,7 @@ window.addEventListener('DOMContentLoaded', async () => {
 
     async function handleSignOut() {
       try {
-        const response = await fetch('http://localhost:3000/logout', {
+        const response = await fetch('https://walletsite1.onrender.com/logout', {
           method: 'POST',
           credentials: 'include' // Important!
         });
