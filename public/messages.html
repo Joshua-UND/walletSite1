@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+  <meta charset="UTF-8">
+
+  <title>Messages</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v6.5.0/css/all.css">
+<script>
+window.addEventListener('DOMContentLoaded', async () => {
+  try {
+    const response = await fetch('http://localhost:3000/check-session', {
+      method: 'GET',
+      credentials: 'include' // important to send cookies
+    });
+
+    const data = await response.json();
+    if (!data.loggedIn) {
+      window.location.href = 'index.html'; // Redirect to login if not logged in
+    }
+  } catch (error) {
+    window.location.href = 'index.html'; // Redirect on error
+  }
+});
+</script>
+
+  <style>
+
+    body {
+
+      margin: 0;
+
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, 'Open Sans', 'Helvetica Neue', sans-serif;
+
+      background: #f9f9f9;
+
+      color: #333;
+
+      padding-bottom: 70px;
+
+    }
+
+    .header {
+
+      background: white;
+
+      padding: 20px;
+
+      font-size: 20px;
+
+      font-weight: bold;
+
+      text-align: center;
+
+      border-bottom: 1px solid #ccc;
+
+      position: sticky;
+
+      top: 0;
+
+      z-index: 100;
+
+    }
+
+    .section {
+
+      padding: 20px;
+
+    }
+
+    .card {
+
+      background: white;
+
+      border-radius: 12px;
+
+      padding: 20px;
+
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+
+      margin: 20px 0;
+
+    }
+
+    .info-text {
+
+      font-size: 15px;
+
+      margin-bottom: 10px;
+
+    }
+
+    .contact-line {
+
+      font-size: 15px;
+
+      margin-top: 15px;
+
+      color: #0046be;
+
+      text-align: center;
+
+      font-weight: 500;
+
+    }
+
+    .newsletter-title {
+
+      font-size: 16px;
+
+      font-weight: 600;
+
+      margin-bottom: 10px;
+
+      text-align: left;
+
+    }
+
+    .newsletter-form {
+
+      display: flex;
+
+      gap: 10px;
+
+      flex-direction: column;
+
+    }
+
+    .newsletter-form input {
+
+  padding: 10px;
+
+  font-size: 14px;
+
+  border-radius: 8px;
+
+  border: 1px solid #ccc;
+
+  width: 100%;
+
+  box-sizing: border-box;
+
+}
+
+
+
+    .newsletter-form button {
+
+      background: linear-gradient(90deg, #0046be, #132e6c);
+
+      color: white;
+
+      padding: 12px;
+
+      font-size: 16px;
+
+      font-weight: bold;
+
+      border: none;
+
+      border-radius: 8px;
+
+      cursor: pointer;
+
+    }
+
+    .newsletter-form button:hover {
+
+      background: #153684;
+
+    }
+
+    .error-message {
+
+      color: red;
+
+      font-size: 13px;
+
+      display: none;
+
+    }
+
+    .modal {
+
+      display: none;
+
+      position: fixed;
+
+      z-index: 999;
+
+      left: 0;
+
+      top: 0;
+
+      width: 100%;
+
+      height: 100%;
+
+      background-color: rgba(0,0,0,0.5);
+
+      justify-content: center;
+
+      align-items: center;
+
+    }
+
+    .modal-content {
+
+      background-color: white;
+
+      padding: 25px;
+
+      border-radius: 12px;
+
+      text-align: center;
+
+      max-width: 300px;
+
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+
+    }
+
+    .spinner {
+
+      width: 30px;
+
+      height: 30px;
+
+      border: 4px solid #ccc;
+
+      border-top: 4px solid #0046be;
+
+      border-radius: 50%;
+
+      animation: spin 0.8s linear infinite;
+
+      margin: 20px auto;
+
+      display: none;
+
+    }
+
+    @keyframes spin {
+
+      0% { transform: rotate(0deg); }
+
+      100% { transform: rotate(360deg); }
+
+    }
+
+    .faq-item {
+
+      border-top: 1px solid #eee;
+
+      padding: 12px 0;
+
+      cursor: pointer;
+
+    }
+
+    .faq-question {
+
+      font-weight: 600;
+
+      font-size: 14px;
+
+      display: flex;
+
+      justify-content: space-between;
+
+      align-items: center;
+
+    }
+
+    .faq-answer {
+
+      font-size: 13px;
+
+      color: #555;
+
+      margin-top: 6px;
+
+      display: none;
+
+    }
+
+    .nav-bar {
+
+      position: fixed;
+
+      bottom: 0;
+
+      left: 0;
+
+      right: 0;
+
+      height: 60px;
+
+      background: white;
+
+      display: flex;
+
+      justify-content: space-around;
+
+      align-items: center;
+
+      border-top: 1px solid #ccc;
+
+      padding-bottom: env(safe-area-inset-bottom);
+
+      z-index: 999;
+
+    }
+
+    .nav-bar div {
+
+      text-align: center;
+
+      font-size: 12px;
+
+      color: #777;
+
+      flex: 1;
+
+      cursor: pointer;
+
+      transition: color 0.3s, transform 0.2s;
+
+      position: relative;
+
+    }
+
+    .nav-bar div:hover {
+
+      color: #132e6c;
+
+      transform: scale(1.1);
+
+    }
+
+    .nav-bar div.active {
+
+      color: #0046be;
+
+      font-weight: bold;
+
+    }
+
+    .nav-content i {
+
+      font-size: 20px;
+
+      display: block;
+
+      margin-bottom: 3px;
+
+    }
+
+    .nav-content {
+
+      display: block;
+
+    }
+
+    .nav-spinner {
+
+      width: 18px;
+
+      height: 18px;
+
+      border: 2px solid #ccc;
+
+      border-top: 2px solid #0b2265;
+
+      border-radius: 50%;
+
+      animation: spin 0.6s linear infinite;
+
+      margin: auto;
+
+      display: none;
+
+    }
+
+    @media (max-width: 400px) {
+
+  .card {
+
+    padding: 15px;
+
+  }
+
+}
+
+
+
+  </style>
+
+</head>
+
+<body>
+
+
+
+<div class="header">Messages</div>
+
+
+
+<div class="section">
+
+  <div class="card">
+
+    <div class="info-text">Welcome! Here you'll find updates, support contacts, and useful tips.</div>
+
+    <div class="info-text">Stay informed by subscribing to our newsletter below.</div>
+
+    <div class="newsletter-title">Subscribe to our newsletter</div>
+
+    <form class="newsletter-form" onsubmit="submitNewsletter(event)">
+
+      <input type="email" id="newsletterEmail" placeholder="Enter your email">
+
+      <div class="error-message" id="emailError">Please enter a valid email address.</div>
+
+      <button type="submit">Subscribe</button>
+
+    </form>
+
+    <div class="spinner" id="newsletterSpinner"></div>
+
+  </div>
+
+
+
+  <div class="contact-line">Contact us on ‪<strong>+1 (363) 208-3725</strong></div>
+
+
+
+  <div class="card">
+
+    <div class="newsletter-title">Frequently Asked Questions</div>
+
+    <div class="faq-item" onclick="toggleFaq(this)">
+
+      <div class="faq-question">How can I reset my PIN?</div>
+
+      <div class="faq-answer">Go to the "More" tab, select "Security Settings", and choose "Reset PIN".</div>
+
+    </div>
+
+    <div class="faq-item" onclick="toggleFaq(this)">
+
+      <div class="faq-question">How do I deposit a check?</div>
+
+      <div class="faq-answer">Navigate to the "Deposit" tab, take a photo of the check, and confirm the amount.</div>
+
+    </div>
+
+    <div class="faq-item" onclick="toggleFaq(this)">
+
+      <div class="faq-question">What if my deposit is delayed?</div>
+
+      <div class="faq-answer">Deposits may take up to 2 business days. If it's longer, contact support via Messages.</div>
+
+    </div>
+
+  </div>
+
+</div>
+
+
+
+<!-- Modal -->
+
+<div class="modal" id="newsletterModal">
+
+  <div class="modal-content">
+
+    <p>✅ You've successfully subscribed!</p>
+
+    <button onclick="closeModal()">OK</button>
+
+  </div>
+
+</div>
+
+
+
+<!-- Navigation Bar -->
+
+<div class="nav-bar">
+
+  <div data-link="account.html" onclick="handleNavClick(event, this)">
+
+    <div class="nav-content"><i class="fas fa-university"></i> Accounts</div>
+
+    <div class="nav-spinner"></div>
+
+  </div>
+
+  <div data-link="transfer.html" onclick="handleNavClick(event, this)">
+
+    <div class="nav-content"><i class="fas fa-exchange-alt"></i> Transfer</div>
+
+    <div class="nav-spinner"></div>
+
+  </div>
+
+  <div data-link="deposit.html" onclick="handleNavClick(event, this)">
+
+    <div class="nav-content"><i class="fas fa-camera"></i> Deposit</div>
+
+    <div class="nav-spinner"></div>
+
+  </div>
+
+  <div class="active" onclick="handleMessageClick(event)">
+
+    <div class="nav-content active"><i class="fas fa-bell"></i> Messages</div>
+
+    <div class="nav-spinner"></div>
+
+  </div>
+
+  <div data-link="more.html" onclick="handleNavClick(event, this)">
+
+    <div class="nav-content"><i class="fas fa-ellipsis-h"></i> More</div>
+
+    <div class="nav-spinner"></div>
+
+  </div>
+
+</div>
+
+
+
+<script>
+
+  function submitNewsletter(event) {
+
+    event.preventDefault();
+
+    const email = document.getElementById('newsletterEmail').value;
+
+    const error = document.getElementById('emailError');
+
+    const spinner = document.getElementById('newsletterSpinner');
+
+
+
+    if (!validateEmail(email)) {
+
+      error.style.display = 'block';
+
+      return;
+
+    }
+
+
+
+    error.style.display = 'none';
+
+    spinner.style.display = 'block';
+
+
+
+    setTimeout(() => {
+
+      spinner.style.display = 'none';
+
+      document.getElementById('newsletterModal').style.display = 'flex';
+
+    }, 3000);
+
+  }
+
+
+
+  function validateEmail(email) {
+
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+
+  }
+
+
+
+  function closeModal() {
+
+    document.getElementById('newsletterModal').style.display = 'none';
+
+  }
+
+
+
+  function toggleFaq(el) {
+
+    const answer = el.querySelector('.faq-answer');
+
+    answer.style.display = answer.style.display === 'block' ? 'none' : 'block';
+
+  }
+
+
+
+  function handleNavClick(event, element) {
+
+    event.preventDefault();
+
+
+
+    const navItems = document.querySelectorAll(".nav-bar div");
+
+    navItems.forEach(item => {
+
+      item.classList.remove("active");
+
+      const content = item.querySelector(".nav-content");
+
+      const spinner = item.querySelector(".nav-spinner");
+
+      if (content) content.style.display = "block";
+
+      if (spinner) spinner.style.display = "none";
+
+    });
+
+
+
+    element.classList.add("active");
+
+    const clickedContent = element.querySelector(".nav-content");
+
+    const clickedSpinner = element.querySelector(".nav-spinner");
+
+    if (clickedContent) clickedContent.style.display = "none";
+
+    if (clickedSpinner) clickedSpinner.style.display = "block";
+
+
+
+    const link = element.getAttribute("data-link");
+
+    if (link) {
+
+      setTimeout(() => {
+
+        window.location.href = link;
+
+      }, 1000);
+
+    }
+
+  }
+
+
+
+  function handleMessageClick(event) {
+
+    handleNavClick(event, event.currentTarget);
+
+    setTimeout(() => {
+
+      window.location.href = "messages.html";
+
+    }, 1000);
+
+  }
+
+</script>
+
+
+
+</body>
+
+</html>
+

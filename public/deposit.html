@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Deposit</title>
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v6.4.0/css/all.css">
+  <script>
+    window.addEventListener('DOMContentLoaded', async () => {
+      try {
+        const response = await fetch('http://localhost:3000/check-session', {
+          method: 'GET',
+          credentials: 'include' // important to send cookies
+        });
+
+        const data = await response.json();
+        if (!data.loggedIn) {
+          window.location.href = 'index.html';
+        }
+      } catch (error) {
+        window.location.href = 'index.html';
+      }
+    });
+  </script>
+  <style>
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+      background: #f9f9f9;
+      color: #333;
+      padding-bottom: 70px;
+    }
+
+    .header {
+      padding: 16px;
+      font-size: 18px;
+      font-weight: 600;
+      background: white;
+      text-align: center;
+      border-bottom: 1px solid #ddd;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    .tabs {
+      display: flex;
+      justify-content: space-between;
+      margin: 0 15px;
+      border-bottom: 1px solid #ccc;
+      font-size: 14px;
+    }
+
+    .tab {
+      padding: 10px 0;
+      flex: 1;
+      text-align: center;
+      color: #666;
+      border-bottom: 2px solid transparent;
+      cursor: pointer;
+    }
+
+    .tab.active {
+      color: #132e6c;
+      font-weight: bold;
+      border-bottom: 2px solid #132e6c;
+    }
+
+    .content {
+      padding: 15px;
+    }
+
+    .card {
+      background: white;
+      border-radius: 12px;
+      padding: 16px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+      margin-bottom: 15px;
+    }
+
+    .field-label {
+      font-size: 13px;
+      color: #666;
+      margin-bottom: 6px;
+    }
+
+    select, input[type="text"] {
+      width: 100%;
+      padding: 10px;
+      font-size: 15px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      background: #fafafa;
+      box-sizing: border-box;
+    }
+
+    .check-image {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #f0f0f0;
+      padding: 12px 15px;
+      border-radius: 10px;
+      margin-top: 15px;
+      cursor: pointer;
+    }
+
+    .note {
+      font-size: 12px;
+      color: #999;
+      margin: 20px 15px;
+      line-height: 1.5;
+    }
+
+    .deposit-button {
+      margin: 20px 15px;
+      background: linear-gradient(90deg, #0046be, #132e6c);
+      color: white;
+      font-size: 16px;
+      font-weight: bold;
+      border: none;
+      width: calc(100% - 30px);
+      padding: 14px;
+      border-radius: 10px;
+      cursor: pointer;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      transition: background 0.3s;
+    }
+
+    .deposit-button:hover {
+      background: linear-gradient(90deg, #132e6c, #0046be);
+    }
+
+    .error-message {
+      color: red;
+      font-size: 13px;
+      margin-top: 6px;
+      display: none;
+    }
+
+    .processing-modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(255,255,255,0.95);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      z-index: 999;
+    }
+
+    .dots {
+      display: flex;
+      gap: 6px;
+      margin-top: 10px;
+    }
+
+    .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #132e6c;
+      animation: blink 1.2s infinite ease-in-out;
+    }
+
+    .dot:nth-child(2) {
+      animation-delay: 0.2s;
+    }
+
+    .dot:nth-child(3) {
+      animation-delay: 0.4s;
+    }
+
+    @keyframes blink {
+      0%, 80%, 100% { opacity: 0; }
+      40% { opacity: 1; }
+    }
+
+    .cancel-btn {
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      font-size: 22px;
+      color: #444;
+      cursor: pointer;
+    }
+
+    .nav-bar {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 60px;
+      background: white;
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      border-top: 1px solid #ccc;
+      padding-bottom: env(safe-area-inset-bottom);
+      z-index: 999;
+    }
+
+    .nav-bar div {
+      text-align: center;
+      font-size: 12px;
+      color: #777;
+      flex: 1;
+      cursor: pointer;
+      transition: color 0.3s, transform 0.2s;
+      position: relative;
+    }
+
+    .nav-bar div:hover {
+      color: #132e6c;
+      transform: scale(1.1);
+    }
+
+    .nav-bar div.active {
+      color: #0046be;
+      font-weight: bold;
+    }
+
+    .nav-content i {
+      font-size: 20px;
+      display: block;
+      margin-bottom: 3px;
+    }
+
+    .nav-content {
+      display: block;
+    }
+
+    .nav-spinner {
+      width: 18px;
+      height: 18px;
+      border: 2px solid #ccc;
+      border-top: 2px solid #0b2265;
+      border-radius: 50%;
+      animation: spin 0.6s linear infinite;
+      margin: auto;
+      display: none;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    
+  </style>
+  </head>
+  <body>
+
+    <div class="header">Deposit</div>
+
+    <div class="tabs">
+      <div class="tab active" onclick="switchTab('deposit')">Deposit</div>
+      <div class="tab" onclick="switchTab('history')">History</div>
+    </div>
+
+    <div id="depositTab" class="content">
+      <div class="card">
+        <div class="field-label">Deposit to</div>
+        <select id="accountSelect">
+          <option value="">Select Account</option>
+          <option value="Investment Account">Investment Account</option>
+        </select>
+
+        <div class="field-label" style="margin-top: 15px;">Amount</div>
+        <input type="text" id="amount" placeholder="$0.00" oninput="formatCurrency(this)">
+
+        <div class="field-label" style="margin-top: 15px;">Description (optional)</div>
+        <input type="text" id="description" placeholder="Write a note">
+
+        <div id="errorText" class="error-message">Please fill in all fields</div>
+
+        <label class="check-image">
+          <span><i class="fas fa-camera"></i> Check image</span>
+          <input type="file" accept="image/*" capture="environment" style="display: none;">
+          <span>Select / Take Photo <i class="fas fa-chevron-right"></i></span>
+        </label>
+      </div>
+
+      <div class="note">
+        Mobile deposits made by 9:00 PM will be available on the next business day.
+      </div>
+
+      <button class="deposit-button" onclick="submitDeposit()">Deposit</button>
+    </div>
+
+    <div id="historyTab" class="content" style="display:none;">
+      <div id="historySpinner" style="display: block;">
+        <div class="nav-spinner" style="display: block;"></div>
+      </div>
+    </div>
+
+    <!-- Processing Modal -->
+    <div class="processing-modal" id="processingModal">
+      <div class="cancel-btn" onclick="cancelProcessing()">&times;</div>
+      <div>Processing</div>
+      <div class="dots">
+        <div class="dot"></div>
+        <div class="dot"></div>
+        <div class="dot"></div>
+      </div>
+    </div>
+
+    <!-- Bottom Navigation -->
+    <div class="nav-bar">
+      <div data-link="account.html" onclick="handleNavClick(event, this)">
+        <div class="nav-content"><i class="fas fa-university"></i> Accounts</div>
+        <div class="nav-spinner"></div>
+      </div>
+      <div data-link="transfer.html" onclick="handleNavClick(event, this)">
+        <div class="nav-content"><i class="fas fa-exchange-alt"></i> Transfer</div>
+        <div class="nav-spinner"></div>
+      </div>
+      <div class="active" data-link="deposit.html" onclick="handleNavClick(event, this)">
+        <div class="nav-content active"><i class="fas fa-camera"></i> Deposit</div>
+        <div class="nav-spinner"></div>
+      </div>
+      <div data-link="messages.html" onclick="handleNavClick(event, this)">
+        <div class="nav-content"><i class="fas fa-bell"></i> Messages</div>
+        <div class="nav-spinner"></div>
+      </div>
+      <div data-link="more.html" onclick="handleNavClick(event, this)">
+        <div class="nav-content"><i class="fas fa-ellipsis-h"></i> More</div>
+        <div class="nav-spinner"></div>
+      </div>
+    </div>
+
+    <script>
+      function switchTab(tab) {
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.content').forEach(c => c.style.display = 'none');
+
+        if (tab === 'deposit') {
+          document.querySelector('.tab:nth-child(1)').classList.add('active');
+          document.getElementById('depositTab').style.display = 'block';
+        } else {
+          document.querySelector('.tab:nth-child(2)').classList.add('active');
+          document.getElementById('historyTab').style.display = 'block';
+        }
+      }
+
+      function formatCurrency(input) {
+        let value = input.value.replace(/[^\d]/g, '');
+        if (value) {
+          value = (parseFloat(value) / 100).toFixed(2);
+          input.value = '$' + value.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        } else {
+          input.value = '';
+        }
+      }
+
+      function submitDeposit() {
+        const account = document.getElementById('accountSelect').value;
+        const amount = document.getElementById('amount').value.trim();
+        const errorText = document.getElementById('errorText');
+
+        if (!account || !amount) {
+          errorText.style.display = 'block';
+          return;
+        }
+
+        errorText.style.display = 'none';
+        document.getElementById('processingModal').style.display = 'flex';
+      }
+
+      function cancelProcessing() {
+        document.getElementById('processingModal').style.display = 'none';
+      }
+
+      function handleNavClick(event, el) {
+        const spinner = el.querySelector('.nav-spinner');
+        const content = el.querySelector('.nav-content');
+
+        spinner.style.display = 'block';
+        content.style.display = 'none';
+
+        setTimeout(() => {
+          window.location.href = el.dataset.link;
+        }, 1000);
+      }
+    </script>
+  </body>
+</html>

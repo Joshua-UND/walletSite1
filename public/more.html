@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>More</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <script>
+window.addEventListener('DOMContentLoaded', async () => {
+  try {
+    const response = await fetch('http://localhost:3000/check-session', {
+      method: 'GET',
+      credentials: 'include' // important to send cookies
+    });
+
+    const data = await response.json();
+    if (!data.loggedIn) {
+      window.location.href = 'index.html'; // Redirect to login if not logged in
+    }
+  } catch (error) {
+    window.location.href = 'index.html'; // Redirect on error
+  }
+});
+</script>
+  <style>
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+      background: #f9f9f9;
+    }
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px 15px;
+      font-size: 20px;
+      font-weight: bold;
+      background: white;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      border-bottom: 1px solid #ccc;
+    }
+    .header a {
+      text-decoration: none;
+      color: #0046be;
+      font-size: 14px;
+      font-weight: normal;
+    }
+    .section {
+      margin-top: 10px;
+    }
+    .section-title {
+      color: #0046be;
+      font-size: 14px;
+      margin: 15px 15px 5px;
+      font-weight: bold;
+    }
+    .item {
+      background: white;
+      padding: 15px;
+      display: flex;
+      align-items: center;
+      border-top: 1px solid #eee;
+      cursor: pointer;
+    }
+    .item:first-child {
+      border-top: none;
+    }
+    .item i {
+      margin-right: 15px;
+      font-size: 18px;
+      color: #555;
+      width: 24px;
+      text-align: center;
+    }
+    .item span {
+      flex-grow: 1;
+      font-size: 16px;
+      color: #333;
+    }
+
+    .nav-bar {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 60px;
+      background: white;
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      border-top: 1px solid #ccc;
+      padding-bottom: env(safe-area-inset-bottom);
+      z-index: 999;
+    }
+    .nav-bar div {
+      text-align: center;
+      font-size: 12px;
+      color: #777;
+      flex: 1;
+      cursor: pointer;
+      transition: color 0.3s, transform 0.2s;
+      position: relative;
+    }
+    .nav-bar div:hover {
+      color: #132e6c;
+      transform: scale(1.1);
+    }
+    .nav-bar div.active {
+      color: #0046be;
+      font-weight: bold;
+    }
+    .nav-content i {
+      font-size: 20px;
+      display: block;
+      margin-bottom: 3px;
+    }
+    .nav-content {
+      display: block;
+    }
+    .nav-spinner {
+      width: 18px;
+      height: 18px;
+      border: 2px solid #ccc;
+      border-top: 2px solid #0b2265;
+      border-radius: 50%;
+      animation: spin 0.6s linear infinite;
+      margin: auto;
+      display: none;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    <span>More</span>
+    <div data-link="index.html" onclick="handleSignOut()" style="cursor: pointer;">
+      <div class="nav-content" style="font-size: 14px;">Sign Out</div>
+      <div class="nav-spinner"></div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Settings & Alerts</div>
+    <div class="item">
+      <i class="fas fa-cog"></i>
+      <span>Profile & Security</span>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Mobile Features</div>
+    <div class="item">
+      <i class="fas fa-link"></i>
+      <span>Outside Accounts</span>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Help & Support</div>
+    <div class="item" onclick="goToMessages()">
+      <i class="fas fa-envelope"></i>
+      <span>Contact Us / FAQs</span>
+    </div>
+  </div>
+
+  <div class="nav-bar">
+    <div data-link="account.html" onclick="handleNavClick(event, this)">
+      <div class="nav-content"><i class="fas fa-university"></i> Accounts</div>
+      <div class="nav-spinner"></div>
+    </div>
+    <div data-link="transfer.html" onclick="handleNavClick(event, this)">
+      <div class="nav-content"><i class="fas fa-exchange-alt"></i> Transfer</div>
+      <div class="nav-spinner"></div>
+    </div>
+    <div data-link="deposit.html" onclick="handleNavClick(event, this)">
+      <div class="nav-content"><i class="fas fa-camera"></i> Deposit</div>
+      <div class="nav-spinner"></div>
+    </div>
+    <div onclick="handleMessageClick(event)">
+      <div class="nav-content"><i class="fas fa-bell"></i> Messages</div>
+      <div class="nav-spinner"></div>
+    </div>
+    <div class="active" data-link="more.html" onclick="handleNavClick(event, this)">
+      <div class="nav-content active"><i class="fas fa-ellipsis-h"></i> More</div>
+      <div class="nav-spinner"></div>
+    </div>
+  </div>
+
+  <script>
+    function handleNavClick(event, element) {
+      event.preventDefault();
+      const navItems = document.querySelectorAll(".nav-bar div");
+      navItems.forEach(item => {
+        item.classList.remove("active");
+        const content = item.querySelector(".nav-content");
+        const spinner = item.querySelector(".nav-spinner");
+        if (content) content.style.display = "block";
+        if (spinner) spinner.style.display = "none";
+      });
+
+      element.classList.add("active");
+      const clickedContent = element.querySelector(".nav-content");
+      const clickedSpinner = element.querySelector(".nav-spinner");
+      if (clickedContent) clickedContent.style.display = "none";
+      if (clickedSpinner) clickedSpinner.style.display = "block";
+
+      const link = element.getAttribute("data-link");
+      if (link) {
+        setTimeout(() => {
+          window.location.href = link;
+        }, 1000);
+      }
+    }
+
+    function handleMessageClick(event) {
+      handleNavClick(event, event.currentTarget);
+      setTimeout(() => {
+        window.location.href = "messages.html";
+      }, 1000);
+    }
+
+    function goToMessages() {
+      const msgLink = document.querySelector('.nav-bar div:nth-child(4)');
+      handleNavClick(new Event('click'), msgLink);
+      setTimeout(() => {
+        window.location.href = "messages.html";
+      }, 1000);
+    }
+
+    async function handleSignOut() {
+      try {
+        const response = await fetch('http://localhost:3000/logout', {
+          method: 'POST',
+          credentials: 'include' // Important!
+        });
+
+        const data = await response.json();
+        if (data.success) {
+          console.error('[Frontend] Sign out success');
+          setTimeout(() => {
+            window.location.href = 'index.html';
+          }, 500);
+        } else {
+          console.error('[Frontend] Sign out failed');
+        }
+      } catch (error) {
+        console.error('[Frontend] Sign out error', error);
+      }
+    }
+  </script>
+
+</body>
+</html>

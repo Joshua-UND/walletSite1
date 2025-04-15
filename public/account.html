@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Account Dashboard</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+<script>
+window.addEventListener('DOMContentLoaded', async () => {
+  try {
+    const response = await fetch('http://localhost:3000/check-session', {
+      method: 'GET',
+      credentials: 'include' // important to send cookies
+    });
+
+    const data = await response.json();
+    if (!data.loggedIn) {
+      window.location.href = 'index.html'; // Redirect to login if not logged in
+    }
+  } catch (error) {
+    window.location.href = 'index.html'; // Redirect on error
+  }
+});
+</script>
+  <style>
+    * {margin:0;padding:0;box-sizing:border-box;}
+    body {
+      font-family: 'Roboto', sans-serif;
+      background: linear-gradient(to right, #eef2f7, #f5f5f5);
+      color: #333;
+    }
+
+    .container {
+      display: flex;
+      flex-direction: column;
+      height: auto;
+      padding-bottom: 70px;
+    }
+
+    .header {
+      background-color: #132e6c;
+      color: white;
+      padding: 30px 20px 20px;
+      text-align: center;
+      border-bottom-left-radius: 10px;
+      border-bottom-right-radius: 10px;
+      animation: slideDown 0.7s ease;
+    }
+
+    @keyframes slideDown {
+      from {transform: translateY(-100px); opacity: 0;}
+      to {transform: translateY(0); opacity: 1;}
+    }
+
+    .header img {
+      width: 180px;
+      margin-bottom: 10px;
+    }
+
+    .header h2 {font-size: 22px; margin: 5px 0;}
+    .header p {font-size: 13px; opacity: 0.8;}
+
+    .main-content {
+      flex: 1;
+      padding: 20px;
+      max-width: 500px;
+      width: 100%;
+      margin: auto;
+    }
+
+    .balance-card, .accounts-list, .spending-card {
+      background: white;
+      margin-bottom: 20px;
+      padding: 30px 20px;
+      border-radius: 20px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+      width: 100%;
+      position: relative;
+    }
+
+    .balance-card {
+      text-align: center;
+    }
+
+    .balance-card h2 {
+      font-size: 18px;
+      margin-bottom: 10px;
+      color: #555;
+    }
+
+    .balance-card .amount {
+      color: #27ae60;
+      font-size: 36px;
+      font-weight: bold;
+    }
+
+    .account-item {
+      padding: 20px 0;
+      border-bottom: 1px solid #eee;
+      position: relative;
+    }
+
+    .account-item h3 {
+      font-size: 18px;
+      color: #333;
+    }
+
+    .account-item p {
+      font-size: 14px;
+      color: #999;
+    }
+
+    .account-item .account-amount {
+      position: absolute;
+      bottom: 10px;
+      right: 20px;
+      font-weight: bold;
+      font-size: 16px;
+    }
+
+    .total {
+      padding: 15px;
+      background-color: #eef2f7;
+      font-weight: bold;
+      text-align: right;
+      font-size: 16px;
+      color: #333;
+    }
+
+    .spending-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 5px; /* reduced from 20px */
+}
+
+    .spending-card .text {
+      max-width: 70%;
+    }
+
+    .spending-card h3 {
+      margin-bottom: 5px;
+      font-size: 18px;
+    }
+
+    .spending-card p {
+      font-size: 14px;
+      color: #777;
+    }
+
+    .spending-card canvas {
+      width: 250px !important;
+      height: 80px;
+    }
+
+    .side-panel {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      margin-top: 0px; /* remove space above buttons */
+      flex-wrap: wrap;
+    }
+
+    .side-panel button {
+      width: 150px;
+      padding: 10px;
+      border: none;
+      border-radius: 30px;
+      background: linear-gradient(90deg, #0046be, #132e6c);
+      color: white;
+      font-size: 14px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.3s;
+      position: relative;
+    }
+
+    .side-panel button:hover {
+      background: #4a90e2;
+    }
+
+   .side-panel button.loading::after {
+      content: '';
+      position: absolute;
+      right: 15px;
+      bottom: 10px; /* moves spinner slightly upward visually */
+      width: 15px;
+      height: 15px;
+      border: 2px solid white;
+      border-top-color: transparent;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: translateY(-50%) rotate(360deg); }
+    }
+
+    .nav-bar {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 60px;
+      background: white;
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      border-top: 1px solid #ccc;
+      padding-bottom: env(safe-area-inset-bottom);
+      z-index: 999;
+    }
+
+    .nav-bar div {
+      text-align: center;
+      font-size: 12px;
+      color: #777;
+      flex: 1;
+      cursor: pointer;
+      transition: color 0.3s, transform 0.2s;
+    }
+
+    .nav-bar div:hover {
+      color: #132e6c;
+      transform: scale(1.1);
+    }
+
+    .nav-bar div.active {
+      color: #0046be;
+      font-weight: bold;
+    }
+
+    .nav-bar div i {
+      font-size: 20px;
+      display: block;
+      margin-bottom: 3px;
+    }
+
+    .spinner {
+      width: 20px;
+      height: 20px;
+      border: 2px solid #ccc;
+      border-top: 2px solid #4a90e2;
+      border-radius: 50%;
+      animation: spin 0.6s linear infinite;
+      display: block;
+      margin: auto;
+      position: relative;
+      }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    @media (max-width: 768px) {
+      .spending-card {flex-direction: column;}
+      .spending-card .text {max-width: 100%; text-align: center;}
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 999;
+      left: 0; top: 0;
+      width: 100%; height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      justify-content: center;
+      align-items: center;
+    }
+
+    .modal-content {
+      background: white;
+      padding: 30px;
+      border-radius: 15px;
+      text-align: center;
+      width: 90%;
+      max-width: 400px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+      animation: popIn 0.3s ease;
+    }
+
+    .modal-content h3 {
+      margin-bottom: 10px;
+      font-size: 20px;
+      color: #c0392b;
+    }
+
+    .modal-content p {
+      font-size: 14px;
+      color: #555;
+      margin-bottom: 20px;
+    }
+
+    .modal-content button {
+      background: linear-gradient(90deg, #0046be, #132e6c);
+      color: white;
+      padding: 8px 20px;
+      border: none;
+      border-radius: 25px;
+      font-size: 14px;
+      cursor: pointer;
+    }
+
+    @keyframes popIn {
+      from { transform: scale(0.9); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="header">
+    <img src="LOGIN_PAGE-removebg-preview.png" alt="TrustBank Logo" />
+    <h2 id="welcome-name">Welcome, Senator Lorraine R. Inouye</h2>
+    <p id="last-login"></p>
+  </div>
+
+  <div class="container">
+    <div class="main-content">
+      <div class="balance-card">
+        <h2>Spendable Balance</h2>
+        <div id="balance" class="amount">$0</div>
+      </div>
+
+      <div class="accounts-list">
+        <div class="account-item">
+          <h3>Investment Account</h3>
+          <p>*2302</p>
+          <div id="account-amount" class="account-amount">$0.00</div>
+        </div>
+        <div id="total-spendable" class="total">Total I Can Spend: $0.00</div>
+      </div>
+
+      <div class="spending-card">
+        <div class="text">
+          <h3>My Spending</h3>
+          <p>Take control of your finances with live trends</p>
+        </div>
+        <div><canvas id="trendChart"></canvas></div>
+      </div>
+    </div>
+
+    <div class="side-panel">
+      <button onclick="handleButtonClick(this)">Invest</button>
+      <button onclick="handleButtonClick(this)">Save</button>
+    </div>
+  </div>
+
+  <div class="nav-bar">
+    <div class="active" data-link="account.html" onclick="handleNavClick(event, this)">
+      <i class="fas fa-university"></i> Accounts
+    </div>
+    <div data-link="transfer.html" onclick="handleNavClick(event, this)">
+      <i class="fas fa-exchange-alt"></i> Transfer
+    </div>
+    <div data-link="deposit.html" onclick="handleNavClick(event, this)">
+      <i class="fas fa-camera"></i> Deposit
+    </div>
+    <div data-link="messages.html" onclick="handleNavClick(event, this)">
+      <i class="fas fa-bell"></i> Messages
+    </div>
+    <div data-link="more.html" onclick="handleNavClick(event, this)">
+      <i class="fas fa-ellipsis-h"></i> More
+    </div>
+  </div>
+
+  <div id="connectionModal" class="modal">
+    <div class="modal-content">
+      <h3>Unable to Connect</h3>
+      <p>Please check your internet connection and try again.</p>
+      <button onclick="closeModal()">Close</button>
+    </div>
+  </div>
+
+  <script>
+    let currentSpinner = null;
+    let currentTimeout = null;
+
+    function formatLastLogin() {
+      const now = new Date();
+      const options = {
+        month: '2-digit',
+        day: '2-digit',
+        year: '2-digit',
+        hour: 'numeric',
+        minute: '2-digit',
+        hour12: true,
+        timeZone: 'America/Chicago'
+      };
+      const formatter = new Intl.DateTimeFormat('en-US', options);
+      document.getElementById('last-login').textContent = `Last Login: ${formatter.format(now)} CST`;
+    }
+
+    formatLastLogin();
+
+    // Fetch totalBalance from backend and animate UI
+    async function fetchAndAnimateBalance() {
+    try {
+      const res = await fetch('http://localhost:3000/dashboard', {
+        credentials: 'include'
+      });
+      const data = await res.json();
+      if (data.totalBalance != null) {
+        animateBalance(data.totalBalance);
+        document.getElementById('welcome-name').textContent = `Welcome, ${data.name || 'User'}`;
+      } else {
+        document.getElementById('balance').textContent = 'Error loading balance';
+      }
+    } catch (err) {
+      console.error('Balance fetch error:', err);
+      document.getElementById('balance').textContent = 'Network error';
+    }
+  }
+
+    function animateBalance(target) {
+      const balanceEl = document.getElementById('balance');
+      const accountAmountEl = document.getElementById('account-amount');
+      const totalSpendableEl = document.getElementById('total-spendable');
+
+      let current = 0;
+      const increment = target / 30;
+
+      function step() {
+        if (current < target) {
+          current += increment;
+          const formatted = `$${current.toLocaleString(undefined, { maximumFractionDigits: 2 })}`;
+          balanceEl.innerText = formatted;
+          accountAmountEl.innerText = formatted;
+          totalSpendableEl.innerText = `Total I Can Spend: ${formatted}`;
+          requestAnimationFrame(step);
+        } else {
+          const formatted = `$${target.toLocaleString(undefined, { maximumFractionDigits: 2 })}`;
+          balanceEl.innerText = formatted;
+          accountAmountEl.innerText = formatted;
+          totalSpendableEl.innerText = `Total I Can Spend: ${formatted}`;
+        }
+      }
+
+      step();
+    }
+
+    fetchAndAnimateBalance();
+
+    // Line chart animation
+    const ctx = document.getElementById('trendChart').getContext('2d');
+    const trendChart = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: Array.from({ length: 20 }, (_, i) => i),
+        datasets: [{
+          data: Array.from({ length: 20 }, () => Math.floor(Math.random() * 100) + 100),
+          borderColor: '#4a90e2',
+          backgroundColor: 'rgba(74,144,226,0.1)',
+          fill: true,
+          tension: 0.4,
+          pointRadius: 0
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: { x: { display: false }, y: { display: false } },
+        plugins: { legend: { display: false } },
+        animation: { duration: 1000, easing: 'easeOutQuart' }
+      }
+    });
+
+    setInterval(() => {
+      trendChart.data.datasets[0].data.shift();
+      trendChart.data.datasets[0].data.push(Math.floor(Math.random() * 100) + 100);
+      trendChart.update();
+    }, 1500);
+
+    function handleButtonClick(button) {
+      button.classList.add('loading');
+      setTimeout(() => {
+        button.classList.remove('loading');
+        showModal();
+      }, 2000);
+    }
+
+    function handleNavClick(event, el) {
+      event.preventDefault();
+
+      // Cancel any existing spinner
+      if (currentSpinner) {
+        currentSpinner.innerHTML = currentSpinner.dataset.original;
+        clearTimeout(currentTimeout);
+      }
+
+      // Store original content
+      el.dataset.original = el.innerHTML;
+      el.innerHTML = `<div class="spinner" style="margin: auto;"></div>`;
+      currentSpinner = el;
+
+      const link = el.getAttribute('data-link');
+      currentTimeout = setTimeout(() => {
+        window.location.href = link;
+      }, 500);
+    }
+
+    function handleMessageClick(event) {
+      event.preventDefault();
+
+      if (currentSpinner) {
+        currentSpinner.innerHTML = currentSpinner.dataset.original;
+        clearTimeout(currentTimeout);
+      }
+
+      const el = event.currentTarget;
+      el.dataset.original = el.innerHTML;
+      el.innerHTML = `<div class="spinner" style="margin: auto;"></div>`;
+      currentSpinner = el;
+
+      setTimeout(() => {
+        showModal();
+      }, 10000);
+    }
+
+    function showModal() {
+      document.getElementById('connectionModal').style.display = 'flex';
+    }
+
+    function closeModal() {
+      document.getElementById('connectionModal').style.display = 'none';
+      if (currentSpinner) {
+        currentSpinner.innerHTML = currentSpinner.dataset.original;
+        currentSpinner = null;
+      }
+    }
+  </script>
+  
+</body>
+</html>
