@@ -386,7 +386,7 @@
 
       if (response.ok && data.success) {
   errorMessage.style.display = 'none';
-  window.location.href = 'account.html'; // success
+  window.location.href = '/account'; // success
 } else {
   errorMessage.style.display = 'block';
   errorMessage.textContent = data.message || 'Incorrect Access ID or Passcode.';
