@@ -502,24 +502,6 @@ window.addEventListener('DOMContentLoaded', async () => {
       }, 500);
     }
 
-    function handleMessageClick(event) {
-      event.preventDefault();
-
-      if (currentSpinner) {
-        currentSpinner.innerHTML = currentSpinner.dataset.original;
-        clearTimeout(currentTimeout);
-      }
-
-      const el = event.currentTarget;
-      el.dataset.original = el.innerHTML;
-      el.innerHTML = `<div class="spinner" style="margin: auto;"></div>`;
-      currentSpinner = el;
-
-      setTimeout(() => {
-        showModal();
-      }, 10000);
-    }
-
     function showModal() {
       document.getElementById('connectionModal').style.display = 'flex';
     }
