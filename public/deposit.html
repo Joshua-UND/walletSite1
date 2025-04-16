@@ -15,10 +15,10 @@
 
         const data = await response.json();
         if (!data.loggedIn) {
-          window.location.href = 'index.html';
+          window.location.href = '/login';
         }
       } catch (error) {
-        window.location.href = 'index.html';
+        window.location.href = '/login';
       }
     });
   </script>
@@ -306,23 +306,23 @@
 
     <!-- Bottom Navigation -->
     <div class="nav-bar">
-      <div data-link="account.html" onclick="handleNavClick(event, this)">
+      <div data-link="/account" onclick="handleNavClick(event, this)">
         <div class="nav-content"><i class="fas fa-university"></i> Accounts</div>
         <div class="nav-spinner"></div>
       </div>
-      <div data-link="transfer.html" onclick="handleNavClick(event, this)">
+      <div data-link="/transfer" onclick="handleNavClick(event, this)">
         <div class="nav-content"><i class="fas fa-exchange-alt"></i> Transfer</div>
         <div class="nav-spinner"></div>
       </div>
-      <div class="active" data-link="deposit.html" onclick="handleNavClick(event, this)">
+      <div class="active" data-link="/deposit" onclick="handleNavClick(event, this)">
         <div class="nav-content active"><i class="fas fa-camera"></i> Deposit</div>
         <div class="nav-spinner"></div>
       </div>
-      <div data-link="messages.html" onclick="handleNavClick(event, this)">
+      <div data-link="/messages" onclick="handleNavClick(event, this)">
         <div class="nav-content"><i class="fas fa-bell"></i> Messages</div>
         <div class="nav-spinner"></div>
       </div>
-      <div data-link="more.html" onclick="handleNavClick(event, this)">
+      <div data-link="/more" onclick="handleNavClick(event, this)">
         <div class="nav-content"><i class="fas fa-ellipsis-h"></i> More</div>
         <div class="nav-spinner"></div>
       </div>
