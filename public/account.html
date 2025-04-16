@@ -18,10 +18,10 @@ window.addEventListener('DOMContentLoaded', async () => {
 
     const data = await response.json();
     if (!data.loggedIn) {
-      window.location.href = '/index'; // Redirect to login if not logged in
+      window.location.href = '/login'; // Redirect to login if not logged in
     }
   } catch (error) {
-    window.location.href = 'index.html';
+    window.location.href = '/login';
   }
 });
 </script>
