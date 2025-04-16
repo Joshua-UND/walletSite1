@@ -139,7 +139,7 @@ window.addEventListener('DOMContentLoaded', async () => {
 
   <div class="header">
     <span>More</span>
-    <div data-link="index.html" onclick="handleSignOut()" style="cursor: pointer;">
+    <div data-link="/login" onclick="handleSignOut()" style="cursor: pointer;">
       <div class="nav-content" style="font-size: 14px;">Sign Out</div>
       <div class="nav-spinner"></div>
     </div>
@@ -217,22 +217,7 @@ window.addEventListener('DOMContentLoaded', async () => {
         }, 1000);
       }
     }
-
-    function handleMessageClick(event) {
-      handleNavClick(event, event.currentTarget);
-      setTimeout(() => {
-        window.location.href = "/messages";
-      }, 1000);
-    }
-
-    function goToMessages() {
-      const msgLink = document.querySelector('.nav-bar div:nth-child(4)');
-      handleNavClick(new Event('click'), msgLink);
-      setTimeout(() => {
-        window.location.href = "messages.html";
-      }, 1000);
-    }
-
+    
     async function handleSignOut() {
       try {
         const response = await fetch('https://walletsite1.onrender.com/logout', {
