@@ -227,6 +227,10 @@ app.get('/more', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'more.html'));
 });
 
+app.get('/login', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
+
 // Start Server
 app.listen(PORT, () => {
   console.log(`[Server Started] Listening on port ${PORT}`);
