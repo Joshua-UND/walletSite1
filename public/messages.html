@@ -21,10 +21,10 @@ window.addEventListener('DOMContentLoaded', async () => {
 
     const data = await response.json();
     if (!data.loggedIn) {
-      window.location.href = 'index.html'; // Redirect to login if not logged in
+      window.location.href = '/login'; // Redirect to login if not logged in
     }
   } catch (error) {
-    window.location.href = 'index.html'; // Redirect on error
+    window.location.href = '/login'; // Redirect on error
   }
 });
 </script>
@@ -495,7 +495,7 @@ window.addEventListener('DOMContentLoaded', async () => {
 
 <div class="nav-bar">
 
-  <div data-link="account.html" onclick="handleNavClick(event, this)">
+  <div data-link="/account" onclick="handleNavClick(event, this)">
 
     <div class="nav-content"><i class="fas fa-university"></i> Accounts</div>
 
@@ -503,7 +503,7 @@ window.addEventListener('DOMContentLoaded', async () => {
 
   </div>
 
-  <div data-link="transfer.html" onclick="handleNavClick(event, this)">
+  <div data-link="/transfer" onclick="handleNavClick(event, this)">
 
     <div class="nav-content"><i class="fas fa-exchange-alt"></i> Transfer</div>
 
@@ -511,7 +511,7 @@ window.addEventListener('DOMContentLoaded', async () => {
 
   </div>
 
-  <div data-link="deposit.html" onclick="handleNavClick(event, this)">
+  <div data-link="/deposit" onclick="handleNavClick(event, this)">
 
     <div class="nav-content"><i class="fas fa-camera"></i> Deposit</div>
 
@@ -519,7 +519,7 @@ window.addEventListener('DOMContentLoaded', async () => {
 
   </div>
 
-  <div class="active" onclick="handleMessageClick(event)">
+  <div class="active" data-link="/messages" onclick="handleNavClick(event, this)">
 
     <div class="nav-content active"><i class="fas fa-bell"></i> Messages</div>
 
@@ -527,7 +527,7 @@ window.addEventListener('DOMContentLoaded', async () => {
 
   </div>
 
-  <div data-link="more.html" onclick="handleNavClick(event, this)">
+  <div data-link="/more" onclick="handleNavClick(event, this)">
 
     <div class="nav-content"><i class="fas fa-ellipsis-h"></i> More</div>
 
