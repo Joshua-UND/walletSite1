@@ -15,10 +15,10 @@ window.addEventListener('DOMContentLoaded', async () => {
 
     const data = await response.json();
     if (!data.loggedIn) {
-      window.location.href = 'index.html'; // Redirect to login if not logged in
+      window.location.href = '/login'; // Redirect to login if not logged in
     }
   } catch (error) {
-    window.location.href = 'index.html'; // Redirect on error
+    window.location.href = '/login'; // Redirect on error
   }
 });
 </script>
@@ -163,30 +163,30 @@ window.addEventListener('DOMContentLoaded', async () => {
 
   <div class="section">
     <div class="section-title">Help & Support</div>
-    <div class="item" onclick="goToMessages()">
+    <div class="item" data-link="/messages" onclick="handleNavClick (event, this)">
       <i class="fas fa-envelope"></i>
       <span>Contact Us / FAQs</span>
     </div>
   </div>
 
   <div class="nav-bar">
-    <div data-link="account.html" onclick="handleNavClick(event, this)">
+    <div data-link="/account" onclick="handleNavClick(event, this)">
       <div class="nav-content"><i class="fas fa-university"></i> Accounts</div>
       <div class="nav-spinner"></div>
     </div>
-    <div data-link="transfer.html" onclick="handleNavClick(event, this)">
+    <div data-link="/transfer" onclick="handleNavClick(event, this)">
       <div class="nav-content"><i class="fas fa-exchange-alt"></i> Transfer</div>
       <div class="nav-spinner"></div>
     </div>
-    <div data-link="deposit.html" onclick="handleNavClick(event, this)">
+    <div data-link="/deposit" onclick="handleNavClick(event, this)">
       <div class="nav-content"><i class="fas fa-camera"></i> Deposit</div>
       <div class="nav-spinner"></div>
     </div>
-    <div onclick="handleMessageClick(event)">
+    <div data-link="/messages"onclick="handleNavClick(event, this)">
       <div class="nav-content"><i class="fas fa-bell"></i> Messages</div>
       <div class="nav-spinner"></div>
     </div>
-    <div class="active" data-link="more.html" onclick="handleNavClick(event, this)">
+    <div class="active" data-link="/more" onclick="handleNavClick(event, this)">
       <div class="nav-content active"><i class="fas fa-ellipsis-h"></i> More</div>
       <div class="nav-spinner"></div>
     </div>
@@ -221,7 +221,7 @@ window.addEventListener('DOMContentLoaded', async () => {
     function handleMessageClick(event) {
       handleNavClick(event, event.currentTarget);
       setTimeout(() => {
-        window.location.href = "messages.html";
+        window.location.href = "/messages";
       }, 1000);
     }
 
